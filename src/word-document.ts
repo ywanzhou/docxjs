@@ -44,7 +44,7 @@ export class WordDocument {
 	extendedPropsPart: ExtendedPropsPart;
 	settingsPart: SettingsPart;
 
-	static load(blob, parser: DocumentParser, options: any): Promise<WordDocument> {
+	static load (blob, parser: DocumentParser, options: any): Promise<WordDocument> {
 		var d = new WordDocument();
 
 		d._options = options;
@@ -59,25 +59,23 @@ export class WordDocument {
 				d.rels = rels;
 
 				const tasks = topLevelRels.map(rel => {
-					const r = rels.find(x => x.type === rel.type) ?? rel; //fallback                    
+					const r = rels.find(x => x.type === rel.type) ?? rel; //fallback    
+					// 解析文档入口
 					return d.loadRelationshipPart(r.target, r.type);
 				});
-
 				return Promise.all(tasks);
 			}).then(() => d);
 	}
 
-	save(type = "blob"): Promise<any> {
+	save (type = "blob"): Promise<any> {
 		return this._package.save(type);
 	}
-
-	private loadRelationshipPart(path: string, type: string): Promise<Part> {
+	private loadRelationshipPart (path: string, type: string): Promise<Part> {
 		if (this.partsMap[path])
 			return Promise.resolve(this.partsMap[path]);
 
 		if (!this._package.get(path))
 			return Promise.resolve(null);
-
 		let part: Part = null;
 
 		switch (type) {
@@ -128,7 +126,7 @@ export class WordDocument {
 			case RelationshipTypes.CustomProperties:
 				part = new CustomPropsPart(this._package, path);
 				break;
-	
+
 			case RelationshipTypes.Settings:
 				this.settingsPart = part = new SettingsPart(this._package, path);
 				break;
@@ -153,22 +151,22 @@ export class WordDocument {
 		});
 	}
 
-	loadDocumentImage(id: string, part?: Part): PromiseLike<string> {
+	loadDocumentImage (id: string, part?: Part): PromiseLike<string> {
 		return this.loadResource(part ?? this.documentPart, id, "blob")
 			.then(x => this.blobToURL(x));
 	}
 
-	loadNumberingImage(id: string): PromiseLike<string> {
+	loadNumberingImage (id: string): PromiseLike<string> {
 		return this.loadResource(this.numberingPart, id, "blob")
 			.then(x => this.blobToURL(x));
 	}
 
-	loadFont(id: string, key: string): PromiseLike<string> {
+	loadFont (id: string, key: string): PromiseLike<string> {
 		return this.loadResource(this.fontTablePart, id, "uint8array")
 			.then(x => x ? this.blobToURL(new Blob([deobfuscate(x, key)])) : x);
 	}
 
-	private blobToURL(blob: Blob): string | PromiseLike<string> {
+	private blobToURL (blob: Blob): string | PromiseLike<string> {
 		if (!blob)
 			return null;
 
@@ -179,25 +177,25 @@ export class WordDocument {
 		return URL.createObjectURL(blob);
 	}
 
-	findPartByRelId(id: string, basePart: Part = null) {
+	findPartByRelId (id: string, basePart: Part = null) {
 		var rel = (basePart.rels ?? this.rels).find(r => r.id == id);
 		const folder = basePart ? splitPath(basePart.path)[0] : '';
 		return rel ? this.partsMap[resolvePath(rel.target, folder)] : null;
 	}
 
-	getPathById(part: Part, id: string): string {
+	getPathById (part: Part, id: string): string {
 		const rel = part.rels.find(x => x.id == id);
 		const [folder] = splitPath(part.path);
 		return rel ? resolvePath(rel.target, folder) : null;
 	}
 
-	private loadResource(part: Part, id: string, outputType: OutputType) {
+	private loadResource (part: Part, id: string, outputType: OutputType) {
 		const path = this.getPathById(part, id);
 		return path ? this._package.load(path, outputType) : Promise.resolve(null);
 	}
 }
 
-export function deobfuscate(data: Uint8Array, guidKey: string): Uint8Array {
+export function deobfuscate (data: Uint8Array, guidKey: string): Uint8Array {
 	const len = 16;
 	const trimmed = guidKey.replace(/{|}|-/g, "");
 	const numbers = new Array(len);

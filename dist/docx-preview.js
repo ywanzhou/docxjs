@@ -36,7 +36,7 @@ var ___CSS_LOADER_URL_IMPORT_0___ = new URL(/* asset import */ __webpack_require
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 var ___CSS_LOADER_URL_REPLACEMENT_0___ = _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default()(___CSS_LOADER_URL_IMPORT_0___);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "@namespace \"http://www.w3.org/1998/Math/MathML\";\nmath {\n  display: inline-block;\n  line-height: initial;\n}\n\nmfrac {\n  display: inline-block;\n  vertical-align: -50%;\n  text-align: center;\n}\nmfrac > :first-child {\n  border-bottom: solid thin currentColor;\n}\nmfrac > * {\n  display: block;\n}\n\nmsub > :nth-child(2) {\n  font-size: smaller;\n  vertical-align: sub;\n}\n\nmsup > :nth-child(2) {\n  font-size: smaller;\n  vertical-align: super;\n}\n\nmunder, mover, munderover {\n  display: inline-flex;\n  flex-flow: column nowrap;\n  vertical-align: middle;\n  text-align: center;\n}\nmunder > :not(:first-child), mover > :not(:first-child), munderover > :not(:first-child) {\n  font-size: smaller;\n}\n\nmunderover > :last-child {\n  order: -1;\n}\n\nmroot, msqrt {\n  position: relative;\n  display: inline-block;\n  border-top: solid thin currentColor;\n  margin-top: 0.5px;\n  vertical-align: middle;\n  margin-left: 1ch;\n}\nmroot:before, msqrt:before {\n  content: \"\";\n  display: inline-block;\n  position: absolute;\n  width: 1ch;\n  left: -1ch;\n  top: -1px;\n  bottom: 0;\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n}", "",{"version":3,"sources":["webpack://./src/mathml.scss"],"names":[],"mappings":"AAAA,+CAAA;AAEA;EACI,qBAAA;EACA,oBAAA;AAAJ;;AAGA;EACI,qBAAA;EACA,oBAAA;EACA,kBAAA;AAAJ;AAEI;EACI,sCAAA;AAAR;AAGI;EACI,cAAA;AADR;;AAMI;EACI,kBAAA;EACA,mBAAA;AAHR;;AAQI;EACI,kBAAA;EACA,qBAAA;AALR;;AASA;EACI,oBAAA;EACA,wBAAA;EACA,sBAAA;EACA,kBAAA;AANJ;AAQI;EACI,kBAAA;AANR;;AAWI;EAAgB,SAAA;AAPpB;;AAUA;EACI,kBAAA;EACA,qBAAA;EACA,mCAAA;EACA,iBAAA;EACA,sBAAA;EACA,gBAAA;AAPJ;AASI;EACI,WAAA;EACA,qBAAA;EACA,kBAAA;EACA,UAAA;EACA,UAAA;EACA,SAAA;EACA,SAAA;EACA,yDAAA;AAPR","sourcesContent":["@namespace \"http://www.w3.org/1998/Math/MathML\";\r\n\r\nmath {\r\n    display: inline-block;\r\n    line-height: initial;\r\n}\r\n\r\nmfrac {\r\n    display: inline-block;\r\n    vertical-align: -50%;\r\n    text-align: center;\r\n\r\n    &>:first-child {\r\n        border-bottom: solid thin currentColor;\r\n    }\r\n\r\n    &>* {\r\n        display: block;\r\n    }\r\n}\r\n\r\nmsub {\r\n    &>:nth-child(2) {\r\n        font-size: smaller;\r\n        vertical-align: sub;\r\n    }\r\n}\r\n\r\nmsup {\r\n    &>:nth-child(2) {\r\n        font-size: smaller;\r\n        vertical-align: super;\r\n    }\r\n}\r\n\r\nmunder, mover, munderover {\r\n    display: inline-flex;\r\n    flex-flow: column nowrap;\r\n    vertical-align: middle;\r\n    text-align: center;\r\n\r\n    &>:not(:first-child) {\r\n        font-size: smaller;\r\n    }\r\n}\r\n\r\nmunderover {\r\n    &>:last-child { order: -1; }\r\n}\r\n\r\nmroot, msqrt {\r\n    position: relative;\r\n    display: inline-block;\r\n    border-top: solid thin currentColor;  \r\n    margin-top: 0.5px;\r\n    vertical-align: middle;  \r\n    margin-left: 1ch; \r\n\r\n    &:before {\r\n        content: \"\";\r\n        display: inline-block;\r\n        position: absolute;\r\n        width: 1ch;\r\n        left: -1ch;\r\n        top: -1px;\r\n        bottom: 0;\r\n        background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 100' preserveAspectRatio='none'%3E%3Cpath d='m0,75 l5,0 l5,25 l10,-100' stroke='black' fill='none' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E\");\r\n    }\r\n}"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "@namespace \"http://www.w3.org/1998/Math/MathML\";\nmath {\n  display: inline-block;\n  line-height: initial;\n}\n\nmfrac {\n  display: inline-block;\n  vertical-align: -50%;\n  text-align: center;\n}\nmfrac > :first-child {\n  border-bottom: solid thin currentColor;\n}\nmfrac > * {\n  display: block;\n}\n\nmsub > :nth-child(2) {\n  font-size: smaller;\n  vertical-align: sub;\n}\n\nmsup > :nth-child(2) {\n  font-size: smaller;\n  vertical-align: super;\n}\n\nmunder, mover, munderover {\n  display: inline-flex;\n  flex-flow: column nowrap;\n  vertical-align: middle;\n  text-align: center;\n}\nmunder > :not(:first-child), mover > :not(:first-child), munderover > :not(:first-child) {\n  font-size: smaller;\n}\n\nmunderover > :last-child {\n  order: -1;\n}\n\nmroot, msqrt {\n  position: relative;\n  display: inline-block;\n  border-top: solid thin currentColor;\n  margin-top: 0.5px;\n  vertical-align: middle;\n  margin-left: 1ch;\n}\nmroot:before, msqrt:before {\n  content: \"\";\n  display: inline-block;\n  position: absolute;\n  width: 1ch;\n  left: -1ch;\n  top: -1px;\n  bottom: 0;\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n}", "",{"version":3,"sources":["webpack://./src/mathml.scss"],"names":[],"mappings":"AAAA,+CAAA;AAEA;EACI,qBAAA;EACA,oBAAA;AAAJ;;AAGA;EACI,qBAAA;EACA,oBAAA;EACA,kBAAA;AAAJ;AAEI;EACI,sCAAA;AAAR;AAGI;EACI,cAAA;AADR;;AAMI;EACI,kBAAA;EACA,mBAAA;AAHR;;AAQI;EACI,kBAAA;EACA,qBAAA;AALR;;AASA;EACI,oBAAA;EACA,wBAAA;EACA,sBAAA;EACA,kBAAA;AANJ;AAQI;EACI,kBAAA;AANR;;AAWI;EAAgB,SAAA;AAPpB;;AAUA;EACI,kBAAA;EACA,qBAAA;EACA,mCAAA;EACA,iBAAA;EACA,sBAAA;EACA,gBAAA;AAPJ;AASI;EACI,WAAA;EACA,qBAAA;EACA,kBAAA;EACA,UAAA;EACA,UAAA;EACA,SAAA;EACA,SAAA;EACA,yDAAA;AAPR","sourcesContent":["@namespace \"http://www.w3.org/1998/Math/MathML\";\n\nmath {\n    display: inline-block;\n    line-height: initial;\n}\n\nmfrac {\n    display: inline-block;\n    vertical-align: -50%;\n    text-align: center;\n\n    &>:first-child {\n        border-bottom: solid thin currentColor;\n    }\n\n    &>* {\n        display: block;\n    }\n}\n\nmsub {\n    &>:nth-child(2) {\n        font-size: smaller;\n        vertical-align: sub;\n    }\n}\n\nmsup {\n    &>:nth-child(2) {\n        font-size: smaller;\n        vertical-align: super;\n    }\n}\n\nmunder, mover, munderover {\n    display: inline-flex;\n    flex-flow: column nowrap;\n    vertical-align: middle;\n    text-align: center;\n\n    &>:not(:first-child) {\n        font-size: smaller;\n    }\n}\n\nmunderover {\n    &>:last-child { order: -1; }\n}\n\nmroot, msqrt {\n    position: relative;\n    display: inline-block;\n    border-top: solid thin currentColor;  \n    margin-top: 0.5px;\n    vertical-align: middle;  \n    margin-left: 1ch; \n\n    &:before {\n        content: \"\";\n        display: inline-block;\n        position: absolute;\n        width: 1ch;\n        left: -1ch;\n        top: -1px;\n        bottom: 0;\n        background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 100' preserveAspectRatio='none'%3E%3Cpath d='m0,75 l5,0 l5,25 l10,-100' stroke='black' fill='none' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E\");\n    }\n}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___.toString());
 
@@ -742,6 +742,7 @@ class DocumentParser {
         };
     }
     parseParagraph(node) {
+        var _a, _b;
         var result = { type: dom_1.DomType.Paragraph, children: [] };
         for (let el of xml_parser_1.default.elements(node)) {
             switch (el.localName) {
@@ -749,7 +750,18 @@ class DocumentParser {
                     this.parseParagraphProperties(el, result);
                     break;
                 case "r":
-                    result.children.push(this.parseRun(el, result));
+                    const res = this.parseRun(el, result);
+                    let flag = true;
+                    const last = (_a = result.children.at(-1)) === null || _a === void 0 ? void 0 : _a.children[0];
+                    if (last && last.type === 'text' && last.text.includes('<---') && !last.text.includes('--->')) {
+                        flag = false;
+                    }
+                    if (flag) {
+                        result.children.push(res);
+                    }
+                    else {
+                        last.text = last.text + ((_b = res.children[0]) === null || _b === void 0 ? void 0 : _b.text);
+                    }
                     break;
                 case "hyperlink":
                     result.children.push(this.parseHyperlink(el, result));
@@ -2309,7 +2321,7 @@ function parseFooterHeaderReference(elem, xml) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.renderAsync = exports.praseAsync = exports.defaultOptions = void 0;
+exports.load = exports.renderAsync = exports.praseAsync = exports.defaultOptions = void 0;
 const word_document_1 = __webpack_require__(/*! ./word-document */ "./src/word-document.ts");
 const document_parser_1 = __webpack_require__(/*! ./document-parser */ "./src/document-parser.ts");
 const html_renderer_1 = __webpack_require__(/*! ./html-renderer */ "./src/html-renderer.ts");
@@ -2330,7 +2342,12 @@ exports.defaultOptions = {
     renderEndnotes: true,
     useBase64URL: false,
     useMathMLPolyfill: false,
-    renderChanges: false
+    renderChanges: false,
+    callback(e, text) {
+        if (text === '<---type:key--->') {
+            e.innerText = '狗蛋';
+        }
+    }
 };
 function praseAsync(data, userOptions = null) {
     const ops = Object.assign(Object.assign({}, exports.defaultOptions), userOptions);
@@ -2343,11 +2360,38 @@ function renderAsync(data, bodyContainer, styleContainer = null, userOptions = n
     return word_document_1.WordDocument
         .load(data, new document_parser_1.DocumentParser(ops), ops)
         .then(doc => {
-        renderer.render(doc, bodyContainer, styleContainer, ops);
+        load(doc, bodyContainer, styleContainer, ops);
         return doc;
     });
 }
 exports.renderAsync = renderAsync;
+function load(doc, bodyContainer, styleContainer = null, userOptions) {
+    bodyContainer.innerHTML = '';
+    const ops = Object.assign(Object.assign({}, exports.defaultOptions), userOptions);
+    const renderer = new html_renderer_1.HtmlRenderer(window.document);
+    renderer.render(doc, bodyContainer, styleContainer, ops);
+    const articleList = Array.from(bodyContainer.children).filter(el => {
+        return el.tagName === 'DIV';
+    });
+    function searchTextDom(element) {
+        if (element.children.length) {
+            const els = Array.from(element.children);
+            for (let el of els) {
+                searchTextDom(el);
+            }
+        }
+        else {
+            if (element.innerText.includes('<---') && element.innerText.includes('--->')) {
+                ops.callback(element, element.innerText);
+                return;
+            }
+        }
+    }
+    articleList.forEach(el => {
+        searchTextDom(el);
+    });
+}
+exports.load = load;
 
 
 /***/ }),
@@ -2950,8 +2994,6 @@ section.${c}>article { margin-bottom: auto; }
                 return this.renderImage(elem);
             case dom_1.DomType.Text:
                 return this.renderText(elem);
-            case dom_1.DomType.Text:
-                return this.renderText(elem);
             case dom_1.DomType.DeletedText:
                 return this.renderDeletedText(elem);
             case dom_1.DomType.Tab:
@@ -3020,8 +3062,9 @@ section.${c}>article { margin-bottom: auto; }
         if (elems == null)
             return null;
         var result = elems.flatMap(e => this.renderElement(e)).filter(e => e != null);
-        if (into)
+        if (into) {
             appendChildren(into, result);
+        }
         return result;
     }
     renderContainer(elem, tagName, props) {

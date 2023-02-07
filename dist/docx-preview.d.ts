@@ -14,6 +14,8 @@ export interface Options {
     ignoreLastRenderedPageBreak: boolean;
 }
 
-export declare const defaultOptions: Options; 
+export declare const defaultOptions: Options;
 
-export declare function renderAsync(data: any, bodyContainer: HTMLElement, styleContainer?: HTMLElement, options?: Partial<Options>): PromiseLike<any>;
+export declare function renderAsync (data: any, bodyContainer: HTMLElement, styleContainer?: HTMLElement, options?: Partial<Options>): PromiseLike<any>;
+export declare function renderAsync (data: any, bodyContainer: HTMLElement, styleContainer?: HTMLElement, options?: Partial<Options>): PromiseLike<any>;
+export declare function load (doc: any, bodyContainer: HTMLElement, styleContainer?: HTMLElement, options?: Partial<Options>): void;

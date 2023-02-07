@@ -59,8 +59,15 @@ export class HtmlRenderer {
 
 	constructor(public htmlDocument: Document) {
 	}
-
-	render(document: WordDocument, bodyContainer: HTMLElement, styleContainer: HTMLElement = null, options: Options) {
+	/**
+	 * 
+	 * @param document wordJSON数据
+	 * @param bodyContainer DOM节点
+	 * @param styleContainer 呈现文档样式、数字和字体？
+	 * @param options 配置项
+	 */
+	render (document: WordDocument, bodyContainer: HTMLElement, styleContainer: HTMLElement = null, options: Options) {
+		// 将参数更新到类中
 		this.document = document;
 		this.options = options;
 		this.className = options.className;
@@ -69,17 +76,21 @@ export class HtmlRenderer {
 
 		styleContainer = styleContainer || bodyContainer;
 
+		// 清空两个DOM中的内容
 		removeAllElements(styleContainer);
 		removeAllElements(bodyContainer);
 
+		// 添加注释节点
 		appendComment(styleContainer, "docxjs library predefined styles");
+		// 添加默认的样式
 		styleContainer.appendChild(this.renderDefaultStyle());
 
+		// 是否包含 MathML 不知道是啥
 		if (!window.MathMLElement && options.useMathMLPolyfill) {
 			appendComment(styleContainer, "docxjs mathml polyfill styles");
 			styleContainer.appendChild(createStyleElement(mathMLCSS));
-		} 
-
+		}
+		// 属性不为空 做一些事情
 		if (document.themePart) {
 			appendComment(styleContainer, "docxjs document theme values");
 			this.renderTheme(document.themePart, styleContainer);
@@ -115,8 +126,8 @@ export class HtmlRenderer {
 		if (!options.ignoreFonts && document.fontTablePart)
 			this.renderFontTable(document.fontTablePart, styleContainer);
 
+		// 获取最终渲染的Word的DOM对象
 		var sectionElements = this.renderSections(document.documentPart.body);
-
 		if (this.options.inWrapper) {
 			bodyContainer.appendChild(this.renderWrapper(sectionElements));
 		} else {
@@ -126,7 +137,7 @@ export class HtmlRenderer {
 		this.refreshTabStops();
 	}
 
-	renderTheme(themePart: ThemePart, styleContainer: HTMLElement) {
+	renderTheme (themePart: ThemePart, styleContainer: HTMLElement) {
 		const variables = {};
 		const fontScheme = themePart.theme?.fontScheme;
 
@@ -152,7 +163,7 @@ export class HtmlRenderer {
 		styleContainer.appendChild(createStyleElement(cssText));
 	}
 
-	renderFontTable(fontsPart: FontTablePart, styleContainer: HTMLElement) {
+	renderFontTable (fontsPart: FontTablePart, styleContainer: HTMLElement) {
 		for (let f of fontsPart.fonts) {
 			for (let ref of f.embedFontRefs) {
 				this.document.loadFont(ref.id, ref.key).then(fontData => {
@@ -178,11 +189,11 @@ export class HtmlRenderer {
 		}
 	}
 
-	processStyleName(className: string): string {
+	processStyleName (className: string): string {
 		return className ? `${this.className}_${escapeClassName(className)}` : this.className;
 	}
 
-	processStyles(styles: IDomStyle[]) {
+	processStyles (styles: IDomStyle[]) {
 		const stylesMap = keyBy(styles.filter(x => x.id != null), x => x.id);
 
 		for (const style of styles.filter(x => x.basedOn)) {
@@ -213,7 +224,7 @@ export class HtmlRenderer {
 		return stylesMap;
 	}
 
-	prodessNumberings(numberings: IDomNumbering[]) {
+	prodessNumberings (numberings: IDomNumbering[]) {
 		for (let num of numberings.filter(n => n.pStyleName)) {
 			const style = this.findStyle(num.pStyleName);
 
@@ -223,11 +234,11 @@ export class HtmlRenderer {
 		}
 	}
 
-	processElement(element: OpenXmlElement) {
+	processElement (element: OpenXmlElement) {
 		if (element.children) {
 			for (var e of element.children) {
 				e.parent = element;
-
+				// 处理表格
 				if (e.type == DomType.Table) {
 					this.processTable(e);
 				}
@@ -238,7 +249,7 @@ export class HtmlRenderer {
 		}
 	}
 
-	processTable(table: WmlTable) {
+	processTable (table: WmlTable) {
 		for (var r of table.children) {
 			for (var c of r.children) {
 				c.cssStyle = this.copyStyleProperties(table.cellStyle, c.cssStyle, [
@@ -251,7 +262,7 @@ export class HtmlRenderer {
 		}
 	}
 
-	copyStyleProperties(input: Record<string, string>, output: Record<string, string>, attrs: string[] = null): Record<string, string> {
+	copyStyleProperties (input: Record<string, string>, output: Record<string, string>, attrs: string[] = null): Record<string, string> {
 		if (!input)
 			return output;
 
@@ -266,7 +277,7 @@ export class HtmlRenderer {
 		return output;
 	}
 
-	createSection(className: string, props: SectionProperties) {
+	createSection (className: string, props: SectionProperties) {
 		var elem = this.createElement("section", { className });
 
 		if (props) {
@@ -297,28 +308,37 @@ export class HtmlRenderer {
 		return elem;
 	}
 
-	renderSections(document: DocumentElement): HTMLElement[] {
+	/**
+	 * 
+	 * @param document Word转换为的JSON对象
+	 * @returns 转换后的DOM节点
+	 */
+	renderSections (document: DocumentElement): HTMLElement[] {
 		const result = [];
-
+		// 找到表格，对表格进行处理 TODO: 做什么处理
 		this.processElement(document);
+		// 将文档拆分为多个页
 		const sections = this.splitBySection(document.children);
 		let prevProps = null;
-
+		// 遍历页
 		for (let i = 0, l = sections.length; i < l; i++) {
 			this.currentFootnoteIds = [];
 
 			const section = sections[i];
 			const props = section.sectProps || document.props;
+			// 创建一个Section
 			const sectionElement = this.createSection(this.className, props);
+			// 将 cssStyle 合并 sectionElement 中
 			this.renderStyleValues(document.cssStyle, sectionElement);
 
+			// ?
 			this.options.renderHeaders && this.renderHeaderFooter(props.headerRefs, props,
 				result.length, prevProps != props, sectionElement);
-
+			// 创建 article 标签
 			var contentElement = this.createElement("article");
+			// 哦塞雷，将Word文字转换为DOM
 			this.renderElements(section.elements, contentElement);
 			sectionElement.appendChild(contentElement);
-
 			if (this.options.renderFootnotes) {
 				this.renderNotes(this.currentFootnoteIds, this.footnoteMap, sectionElement);
 			}
@@ -337,7 +357,7 @@ export class HtmlRenderer {
 		return result;
 	}
 
-	renderHeaderFooter(refs: FooterHeaderReference[], props: SectionProperties, page: number, firstOfSection: boolean, into: HTMLElement) {
+	renderHeaderFooter (refs: FooterHeaderReference[], props: SectionProperties, page: number, firstOfSection: boolean, into: HTMLElement) {
 		if (!refs) return;
 
 		var ref = (props.titlePage && firstOfSection ? refs.find(x => x.type == "first") : null)
@@ -357,7 +377,7 @@ export class HtmlRenderer {
 		}
 	}
 
-	isPageBreakElement(elem: OpenXmlElement): boolean {
+	isPageBreakElement (elem: OpenXmlElement): boolean {
 		if (elem.type != DomType.Break)
 			return false;
 
@@ -367,7 +387,7 @@ export class HtmlRenderer {
 		return (elem as WmlBreak).break == "page";
 	}
 
-	splitBySection(elements: OpenXmlElement[]): { sectProps: SectionProperties, elements: OpenXmlElement[] }[] {
+	splitBySection (elements: OpenXmlElement[]): { sectProps: SectionProperties, elements: OpenXmlElement[] }[] {
 		var current = { sectProps: null, elements: [] };
 		var result = [current];
 
@@ -438,11 +458,11 @@ export class HtmlRenderer {
 		return result;
 	}
 
-	renderWrapper(children: HTMLElement[]) {
+	renderWrapper (children: HTMLElement[]) {
 		return this.createElement("div", { className: `${this.className}-wrapper` }, children);
 	}
 
-	renderDefaultStyle() {
+	renderDefaultStyle () {
 		var c = this.className;
 		var styleText = `
 .${c}-wrapper { background: gray; padding: 30px; padding-bottom: 0px; display: flex; flex-flow: column; align-items: center; } 
@@ -456,7 +476,6 @@ section.${c}>article { margin-bottom: auto; }
 .${c} span { white-space: pre-wrap; overflow-wrap: break-word; }
 .${c} a { color: inherit; text-decoration: inherit; }
 `;
-
 		return createStyleElement(styleText);
 	}
 
@@ -525,7 +544,7 @@ section.${c}>article { margin-bottom: auto; }
 	//     return createStyleElement(css);
 	// }
 
-	renderNumbering(numberings: IDomNumbering[], styleContainer: HTMLElement) {
+	renderNumbering (numberings: IDomNumbering[], styleContainer: HTMLElement) {
 		var styleText = "";
 		var rootCounters = [];
 
@@ -586,7 +605,7 @@ section.${c}>article { margin-bottom: auto; }
 		return createStyleElement(styleText);
 	}
 
-	renderStyles(styles: IDomStyle[]): HTMLElement {
+	renderStyles (styles: IDomStyle[]): HTMLElement {
 		var styleText = "";
 		const stylesMap = this.styleMap;
 		const defautStyles = keyBy(styles.filter(s => s.isDefault), s => s.target);
@@ -620,7 +639,7 @@ section.${c}>article { margin-bottom: auto; }
 		return createStyleElement(styleText);
 	}
 
-	renderNotes(noteIds: string[], notesMap: Record<string, WmlBaseNote>, into: HTMLElement) {
+	renderNotes (noteIds: string[], notesMap: Record<string, WmlBaseNote>, into: HTMLElement) {
 		var notes = noteIds.map(id => notesMap[id]).filter(x => x);
 
 		if (notes.length > 0) {
@@ -628,8 +647,8 @@ section.${c}>article { margin-bottom: auto; }
 			into.appendChild(result);
 		}
 	}
-
-	renderElement(elem: OpenXmlElement): Node | Node[] {
+	// * 将对应的内容转换为DOM节点
+	renderElement (elem: OpenXmlElement): Node | Node[] {
 		switch (elem.type) {
 			case DomType.Paragraph:
 				return this.renderParagraph(elem as WmlParagraph);
@@ -664,12 +683,9 @@ section.${c}>article { margin-bottom: auto; }
 			case DomType.Text:
 				return this.renderText(elem as WmlText);
 
-			case DomType.Text:
-				return this.renderText(elem as WmlText);
-
 			case DomType.DeletedText:
 				return this.renderDeletedText(elem as WmlText);
-	
+
 			case DomType.Tab:
 				return this.renderTab(elem);
 
@@ -703,10 +719,10 @@ section.${c}>article { margin-bottom: auto; }
 
 			case DomType.VmlElement:
 				return this.renderVmlElement(elem as VmlElement);
-	
+
 			case DomType.MmlMath:
 				return this.renderContainerNS(elem, ns.mathML, "math", { xmlns: ns.mathML });
-	
+
 			case DomType.MmlMathParagraph:
 				return this.renderContainer(elem, "span");
 
@@ -728,7 +744,7 @@ section.${c}>article { margin-bottom: auto; }
 
 			case DomType.MmlSubscript:
 				return this.renderContainerNS(elem, ns.mathML, "msub");
-	
+
 			case DomType.MmlBase:
 				return this.renderContainerNS(elem, ns.mathML, "mrow");
 
@@ -757,31 +773,32 @@ section.${c}>article { margin-bottom: auto; }
 		return null;
 	}
 
-	renderChildren(elem: OpenXmlElement, into?: Element): Node[] {
+	renderChildren (elem: OpenXmlElement, into?: Element): Node[] {
 		return this.renderElements(elem.children, into);
 	}
 
-	renderElements(elems: OpenXmlElement[], into?: Element): Node[] {
+	renderElements (elems: OpenXmlElement[], into?: Element): Node[] {
 		if (elems == null)
 			return null;
 
 		var result = elems.flatMap(e => this.renderElement(e)).filter(e => e != null);
-
-		if (into)
+		if (into) {
+			// 将Node添加到Element中
 			appendChildren(into, result);
+		}
 
 		return result;
 	}
 
-	renderContainer(elem: OpenXmlElement, tagName: keyof HTMLElementTagNameMap, props?: Record<string, any>) {
+	renderContainer (elem: OpenXmlElement, tagName: keyof HTMLElementTagNameMap, props?: Record<string, any>) {
 		return this.createElement(tagName, props, this.renderChildren(elem));
 	}
 
-	renderContainerNS(elem: OpenXmlElement, ns: string, tagName: string, props?: Record<string, any>) {
+	renderContainerNS (elem: OpenXmlElement, ns: string, tagName: string, props?: Record<string, any>) {
 		return createElementNS(ns, tagName, props, this.renderChildren(elem));
 	}
 
-	renderParagraph(elem: WmlParagraph) {
+	renderParagraph (elem: WmlParagraph) {
 		var result = this.createElement("p");
 
 		const style = this.findStyle(elem.styleName);
@@ -801,11 +818,11 @@ section.${c}>article { margin-bottom: auto; }
 		return result;
 	}
 
-	renderRunProperties(style: any, props: RunProperties) {
+	renderRunProperties (style: any, props: RunProperties) {
 		this.renderCommonProperties(style, props);
 	}
 
-	renderCommonProperties(style: any, props: CommonProperties) {
+	renderCommonProperties (style: any, props: CommonProperties) {
 		if (props == null)
 			return;
 
@@ -818,7 +835,7 @@ section.${c}>article { margin-bottom: auto; }
 		}
 	}
 
-	renderHyperlink(elem: WmlHyperlink) {
+	renderHyperlink (elem: WmlHyperlink) {
 		var result = this.createElement("a");
 
 		this.renderChildren(elem, result);
@@ -826,7 +843,7 @@ section.${c}>article { margin-bottom: auto; }
 
 		if (elem.href) {
 			result.href = elem.href;
-		} else if(elem.id) {
+		} else if (elem.id) {
 			const rel = this.document.documentPart.rels
 				.find(it => it.id == elem.id && it.targetMode === "External");
 			result.href = rel?.target;
@@ -835,7 +852,7 @@ section.${c}>article { margin-bottom: auto; }
 		return result;
 	}
 
-	renderDrawing(elem: OpenXmlElement) {
+	renderDrawing (elem: OpenXmlElement) {
 		var result = this.createElement("div");
 
 		result.style.display = "inline-block";
@@ -848,7 +865,7 @@ section.${c}>article { margin-bottom: auto; }
 		return result;
 	}
 
-	renderImage(elem: IDomImage) {
+	renderImage (elem: IDomImage) {
 		let result = this.createElement("img");
 
 		this.renderStyleValues(elem.cssStyle, result);
@@ -862,15 +879,15 @@ section.${c}>article { margin-bottom: auto; }
 		return result;
 	}
 
-	renderText(elem: WmlText) {
+	renderText (elem: WmlText) {
 		return this.htmlDocument.createTextNode(elem.text);
 	}
 
-	renderDeletedText(elem: WmlText) {
+	renderDeletedText (elem: WmlText) {
 		return this.options.renderEndnotes ? this.htmlDocument.createTextNode(elem.text) : null;
 	}
 
-	renderBreak(elem: WmlBreak) {
+	renderBreak (elem: WmlBreak) {
 		if (elem.break == "textWrapping") {
 			return this.createElement("br");
 		}
@@ -878,42 +895,42 @@ section.${c}>article { margin-bottom: auto; }
 		return null;
 	}
 
-	renderInserted(elem: OpenXmlElement): Node | Node[] {
+	renderInserted (elem: OpenXmlElement): Node | Node[] {
 		if (this.options.renderChanges)
 			return this.renderContainer(elem, "ins");
 
 		return this.renderChildren(elem);
 	}
 
-	renderDeleted(elem: OpenXmlElement): Node {
+	renderDeleted (elem: OpenXmlElement): Node {
 		if (this.options.renderChanges)
 			return this.renderContainer(elem, "del");
 
 		return null;
 	}
 
-	renderSymbol(elem: WmlSymbol) {
+	renderSymbol (elem: WmlSymbol) {
 		var span = this.createElement("span");
 		span.style.fontFamily = elem.font;
 		span.innerHTML = `&#x${elem.char};`
 		return span;
 	}
 
-	renderFootnoteReference(elem: WmlNoteReference) {
+	renderFootnoteReference (elem: WmlNoteReference) {
 		var result = this.createElement("sup");
 		this.currentFootnoteIds.push(elem.id);
 		result.textContent = `${this.currentFootnoteIds.length}`;
 		return result;
 	}
 
-	renderEndnoteReference(elem: WmlNoteReference) {
+	renderEndnoteReference (elem: WmlNoteReference) {
 		var result = this.createElement("sup");
 		this.currentEndnoteIds.push(elem.id);
 		result.textContent = `${this.currentEndnoteIds.length}`;
 		return result;
 	}
 
-	renderTab(elem: OpenXmlElement) {
+	renderTab (elem: OpenXmlElement) {
 		var tabSpan = this.createElement("span");
 
 		tabSpan.innerHTML = "&emsp;";//"&nbsp;";
@@ -927,13 +944,13 @@ section.${c}>article { margin-bottom: auto; }
 		return tabSpan;
 	}
 
-	renderBookmarkStart(elem: WmlBookmarkStart): HTMLElement {
+	renderBookmarkStart (elem: WmlBookmarkStart): HTMLElement {
 		var result = this.createElement("span");
 		result.id = elem.name;
 		return result;
 	}
 
-	renderRun(elem: WmlRun) {
+	renderRun (elem: WmlRun) {
 		if (elem.fieldRun)
 			return null;
 
@@ -957,7 +974,7 @@ section.${c}>article { margin-bottom: auto; }
 		return result;
 	}
 
-	renderTable(elem: WmlTable) {
+	renderTable (elem: WmlTable) {
 		let result = this.createElement("table");
 
 		this.tableCellPositions.push(this.currentCellPosition);
@@ -978,7 +995,7 @@ section.${c}>article { margin-bottom: auto; }
 		return result;
 	}
 
-	renderTableColumns(columns: WmlTableColumn[]) {
+	renderTableColumns (columns: WmlTableColumn[]) {
 		let result = this.createElement("colgroup");
 
 		for (let col of columns) {
@@ -993,7 +1010,7 @@ section.${c}>article { margin-bottom: auto; }
 		return result;
 	}
 
-	renderTableRow(elem: OpenXmlElement) {
+	renderTableRow (elem: OpenXmlElement) {
 		let result = this.createElement("tr");
 
 		this.currentCellPosition.col = 0;
@@ -1007,7 +1024,7 @@ section.${c}>article { margin-bottom: auto; }
 		return result;
 	}
 
-	renderTableCell(elem: WmlTableCell) {
+	renderTableCell (elem: WmlTableCell) {
 		let result = this.createElement("td");
 
 		const key = this.currentCellPosition.col;
@@ -1036,13 +1053,13 @@ section.${c}>article { margin-bottom: auto; }
 		return result;
 	}
 
-	renderVmlPicture(elem: OpenXmlElement) {
+	renderVmlPicture (elem: OpenXmlElement) {
 		var result = createElement("div");
 		this.renderChildren(elem, result);
 		return result;
 	}
 
-	renderVmlElement(elem: VmlElement): SVGElement {
+	renderVmlElement (elem: VmlElement): SVGElement {
 		var container = createSvgElement("svg");
 
 		container.setAttribute("style", elem.cssStyleText);
@@ -1054,20 +1071,20 @@ section.${c}>article { margin-bottom: auto; }
 			this.document?.loadDocumentImage(elem.imageHref.id, this.currentPart)
 				.then(x => result.setAttribute("href", x));
 		}
-		
+
 		container.appendChild(result);
 
 		setTimeout(() => {
 			const bb = (container.firstElementChild as any).getBBox();
 
-			container.setAttribute("width", `${Math.ceil(bb.x +  bb.width)}`);
+			container.setAttribute("width", `${Math.ceil(bb.x + bb.width)}`);
 			container.setAttribute("height", `${Math.ceil(bb.y + bb.height)}`);
 		}, 0);
 
 		return container;
 	}
 
-	renderMmlRadical(elem: OpenXmlElement): HTMLElement {
+	renderMmlRadical (elem: OpenXmlElement): HTMLElement {
 		const base = elem.children.find(el => el.type == DomType.MmlBase);
 
 		if (elem.props?.hideDegree) {
@@ -1078,7 +1095,7 @@ section.${c}>article { margin-bottom: auto; }
 		return createElementNS(ns.mathML, "mroot", null, this.renderElements([base, degree]));
 	}
 
-	renderMmlDelimiter(elem: OpenXmlElement): HTMLElement {		
+	renderMmlDelimiter (elem: OpenXmlElement): HTMLElement {
 		const children = [];
 
 		children.push(createElementNS(ns.mathML, "mo", null, [elem.props.beginChar ?? '(']));
@@ -1088,7 +1105,7 @@ section.${c}>article { margin-bottom: auto; }
 		return createElementNS(ns.mathML, "mrow", null, children);
 	}
 
-	renderMmlNary(elem: OpenXmlElement): HTMLElement {		
+	renderMmlNary (elem: OpenXmlElement): HTMLElement {
 		const children = [];
 		const grouped = keyBy(elem.children, x => x.type);
 
@@ -1102,9 +1119,9 @@ section.${c}>article { margin-bottom: auto; }
 
 			if (supElem || subElem) {
 				children.push(createElementNS(ns.mathML, "munderover", null, [charElem, subElem, supElem]));
-			} else if(supElem) {
+			} else if (supElem) {
 				children.push(createElementNS(ns.mathML, "mover", null, [charElem, supElem]));
-			} else if(subElem) {
+			} else if (subElem) {
 				children.push(createElementNS(ns.mathML, "munder", null, [charElem, subElem]));
 			} else {
 				children.push(charElem);
@@ -1116,7 +1133,7 @@ section.${c}>article { margin-bottom: auto; }
 		return createElementNS(ns.mathML, "mrow", null, children);
 	}
 
-	renderMmlRun(elem: OpenXmlElement) {
+	renderMmlRun (elem: OpenXmlElement) {
 		const result = createElementNS(ns.mathML, "ms");
 
 		this.renderClass(elem, result);
@@ -1126,11 +1143,11 @@ section.${c}>article { margin-bottom: auto; }
 		return result;
 	}
 
-	renderStyleValues(style: Record<string, string>, ouput: HTMLElement) {
+	renderStyleValues (style: Record<string, string>, ouput: HTMLElement) {
 		Object.assign(ouput.style, style);
 	}
 
-	renderClass(input: OpenXmlElement, ouput: HTMLElement) {
+	renderClass (input: OpenXmlElement, ouput: HTMLElement) {
 		if (input.className)
 			ouput.className = input.className;
 
@@ -1138,19 +1155,19 @@ section.${c}>article { margin-bottom: auto; }
 			ouput.classList.add(this.processStyleName(input.styleName));
 	}
 
-	findStyle(styleName: string) {
+	findStyle (styleName: string) {
 		return styleName && this.styleMap?.[styleName];
 	}
 
-	numberingClass(id: string, lvl: number) {
+	numberingClass (id: string, lvl: number) {
 		return `${this.className}-num-${id}-${lvl}`;
 	}
 
-	tabStopClass() {
+	tabStopClass () {
 		return `${this.className}-tab-stop`;
 	}
 
-	styleToString(selectors: string, values: Record<string, string>, cssText: string = null) {
+	styleToString (selectors: string, values: Record<string, string>, cssText: string = null) {
 		let result = `${selectors} {\r\n`;
 
 		for (const key in values) {
@@ -1163,11 +1180,11 @@ section.${c}>article { margin-bottom: auto; }
 		return result + "}\r\n";
 	}
 
-	numberingCounter(id: string, lvl: number) {
+	numberingCounter (id: string, lvl: number) {
 		return `${this.className}-num-${id}-${lvl}`;
 	}
 
-	levelTextToContent(text: string, suff: string, id: string, numformat: string) {
+	levelTextToContent (text: string, suff: string, id: string, numformat: string) {
 		const suffMap = {
 			"tab": "\\9",
 			"space": "\\a0",
@@ -1181,7 +1198,7 @@ section.${c}>article { margin-bottom: auto; }
 		return `"${result}${suffMap[suff] ?? ""}"`;
 	}
 
-	numFormatToCssValue(format: string) {
+	numFormatToCssValue (format: string) {
 		var mapping = {
 			"none": "none",
 			"bullet": "disc",
@@ -1195,7 +1212,7 @@ section.${c}>article { margin-bottom: auto; }
 		return mapping[format] || format;
 	}
 
-	refreshTabStops() {
+	refreshTabStops () {
 		if (!this.options.experimental)
 			return;
 
@@ -1215,7 +1232,7 @@ section.${c}>article { margin-bottom: auto; }
 
 type ChildType = Node | string;
 
-function createElement<T extends keyof HTMLElementTagNameMap>(
+function createElement<T extends keyof HTMLElementTagNameMap> (
 	tagName: T,
 	props?: Partial<Record<keyof HTMLElementTagNameMap[T], any>>,
 	children?: ChildType[]
@@ -1223,7 +1240,7 @@ function createElement<T extends keyof HTMLElementTagNameMap>(
 	return createElementNS(undefined, tagName, props, children);
 }
 
-function createSvgElement<T extends keyof SVGElementTagNameMap>(
+function createSvgElement<T extends keyof SVGElementTagNameMap> (
 	tagName: T,
 	props?: Partial<Record<keyof SVGElementTagNameMap[T], any>>,
 	children?: ChildType[]
@@ -1231,30 +1248,31 @@ function createSvgElement<T extends keyof SVGElementTagNameMap>(
 	return createElementNS(ns.svg, tagName, props, children);
 }
 
-function createElementNS(ns: string, tagName: string, props?: Partial<Record<any, any>>, children?: ChildType[]): any {
+function createElementNS (ns: string, tagName: string, props?: Partial<Record<any, any>>, children?: ChildType[]): any {
 	var result = ns ? document.createElementNS(ns, tagName) : document.createElement(tagName);
 	Object.assign(result, props);
 	children && appendChildren(result, children);
 	return result;
 }
 
-function removeAllElements(elem: HTMLElement) {
+function removeAllElements (elem: HTMLElement) {
 	elem.innerHTML = '';
 }
 
-function appendChildren(elem: Element, children: (Node | string)[]) {
+// * 将转换后的DOM添加到对应的节点上
+function appendChildren (elem: Element, children: (Node | string)[]) {
 	children.forEach(c => elem.appendChild(isString(c) ? document.createTextNode(c) : c));
 }
 
-function createStyleElement(cssText: string) {
+function createStyleElement (cssText: string) {
 	return createElement("style", { innerHTML: cssText });
 }
 
-function appendComment(elem: HTMLElement, comment: string) {
+function appendComment (elem: HTMLElement, comment: string) {
 	elem.appendChild(document.createComment(comment));
 }
 
-function findParent<T extends OpenXmlElement>(elem: OpenXmlElement, type: DomType): T {
+function findParent<T extends OpenXmlElement> (elem: OpenXmlElement, type: DomType): T {
 	var parent = elem.parent;
 
 	while (parent != null && parent.type != type)

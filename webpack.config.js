@@ -5,7 +5,7 @@ const PATHS = {
   build: path.join(__dirname, './dist')
 }
 
-function buildConfig(prod) {
+function buildConfig (prod) {
   const outputFilename = `[name]${prod ? '.min' : ''}.js`;
 
   return {
