@@ -11,10 +11,10 @@ export class DocumentPart extends Part {
         super(pkg, path);
         this._documentParser = parser;
     }
-
     body: DocumentElement
 
     parseXml (root: Element) {
+        console.log(root)
         this.body = this._documentParser.parseDocumentFile(root);
     }
 }

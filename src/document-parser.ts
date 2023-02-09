@@ -465,8 +465,8 @@ export class DocumentParser {
 				case "r":
 					const res = this.parseRun(el, result)
 					let flag = true
-					const last: any = result.children.at(-1)?.children[0]
-					if (last && last.type === 'text' && last.text.includes('<---') && !last.text.includes('--->')) {
+					const last: any = result.children.at(-1)?.children?.[0]
+					if (last && last.type === 'text' && last.text.includes('${') && !last.text.includes('}$')) {
 						flag = false
 					}
 					if (flag) {

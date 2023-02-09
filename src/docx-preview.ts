@@ -42,9 +42,6 @@ export const defaultOptions: Options = {
     useMathMLPolyfill: false,
     renderChanges: false,
     callback (e: HTMLElement, text: string) {
-        if (text === '<---type:key--->') {
-            e.innerText = '狗蛋'
-        }
     }
 }
 
@@ -81,7 +78,7 @@ export function load (doc: WordDocument, bodyContainer: HTMLElement, styleContai
                 searchTextDom(el)
             }
         } else {
-            if (element.innerText.includes('<---') && element.innerText.includes('--->')) {
+            if (element.innerText.includes('${') && element.innerText.includes('}$')) {
                 ops.callback(element, element.innerText)
                 return
             }

@@ -742,7 +742,7 @@ class DocumentParser {
         };
     }
     parseParagraph(node) {
-        var _a, _b;
+        var _a, _b, _c;
         var result = { type: dom_1.DomType.Paragraph, children: [] };
         for (let el of xml_parser_1.default.elements(node)) {
             switch (el.localName) {
@@ -752,15 +752,15 @@ class DocumentParser {
                 case "r":
                     const res = this.parseRun(el, result);
                     let flag = true;
-                    const last = (_a = result.children.at(-1)) === null || _a === void 0 ? void 0 : _a.children[0];
-                    if (last && last.type === 'text' && last.text.includes('<---') && !last.text.includes('--->')) {
+                    const last = (_b = (_a = result.children.at(-1)) === null || _a === void 0 ? void 0 : _a.children) === null || _b === void 0 ? void 0 : _b[0];
+                    if (last && last.type === 'text' && last.text.includes('${') && !last.text.includes('}$')) {
                         flag = false;
                     }
                     if (flag) {
                         result.children.push(res);
                     }
                     else {
-                        last.text = last.text + ((_b = res.children[0]) === null || _b === void 0 ? void 0 : _b.text);
+                        last.text = last.text + ((_c = res.children[0]) === null || _c === void 0 ? void 0 : _c.text);
                     }
                     break;
                 case "hyperlink":
@@ -1999,6 +1999,7 @@ class DocumentPart extends part_1.Part {
         this._documentParser = parser;
     }
     parseXml(root) {
+        console.log(root);
         this.body = this._documentParser.parseDocumentFile(root);
     }
 }
@@ -2344,9 +2345,6 @@ exports.defaultOptions = {
     useMathMLPolyfill: false,
     renderChanges: false,
     callback(e, text) {
-        if (text === '<---type:key--->') {
-            e.innerText = '狗蛋';
-        }
     }
 };
 function praseAsync(data, userOptions = null) {
@@ -2381,7 +2379,7 @@ function load(doc, bodyContainer, styleContainer = null, userOptions) {
             }
         }
         else {
-            if (element.innerText.includes('<---') && element.innerText.includes('--->')) {
+            if (element.innerText.includes('${') && element.innerText.includes('}$')) {
                 ops.callback(element, element.innerText);
                 return;
             }
